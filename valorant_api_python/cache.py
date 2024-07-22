@@ -22,7 +22,7 @@ def async_caching(func: Callable):
             if cache.get(values,False):
                 return cache[values]
             cache[values] = await func(*args,**kwargs)
-            return cache
+            return cache[values]
         else:
             cache.pop(values,None)
         return await func(*args,**kwargs)
