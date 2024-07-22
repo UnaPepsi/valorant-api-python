@@ -28,7 +28,7 @@ class TierIcon:
 
 class Tier:
     def __init__(self, data: Dict[str,Any]):
-        self.tier: Optional[int32] = int32(data.get('tier',0)) if data.get('tier') else None
+        self.tier: Optional[int32] = int32(data.get('tier',0)) if data.get('tier',None) is not None else None
         self._name: Optional[str] = data.get('tierName')
         self.division: Optional[str] = data.get('division')
         self._division_name: Optional[str] = data.get('divisionName')
@@ -42,13 +42,13 @@ class Tier:
     @property
     def name(self) -> Optional[str]:
         """The name of the tier. This value changes depending on the language you have set.
-        You can also get this value by using `str(Tier)`"""
+        You can also get this value (if not `None`) by using `str(Tier)`"""
         return self._name
     
     @property
     def division_name(self) -> Optional[str]:
         """The name of the division. This value changes depending on the language you have set.
-        You can also get this value by using `str(Tier)`"""
+        You can also get this value (if not `None`) by using `str(Tier)`"""
         return self._division_name
 
     def __str__(self):
@@ -71,6 +71,7 @@ class CompetitiveTier:
     def __init__(self, data: Dict[str,Any]):
         self.uuid: Optional[str] = data.get('uuid')
         self.asset_object_name: Optional[str] = data.get('assetObjectName') #episodes
-        self.tiers: List[Tier] = [Tier(info) for info in data.get('tiers',[])]
+        self.tiers: List[Tier] = [Tier(info) for info in data.get('tiers',[])] if data.get('tiers') else []
         self.asset_path: Optional[str] = data.get('assetPath')
-        self._filter_unused_tiers: List[Tier] = list(filter(lambda tier: tier.name and 'Unused' not in tier.name, self.tiers))
+        self._filter_unused_tiers: List[Tier] = list(filter(lambda tier: tier.name and 'Unused' not in tier.name, self.tiers)) if self.tiers else []
+        self._raw = data

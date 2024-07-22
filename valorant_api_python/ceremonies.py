@@ -24,11 +24,12 @@ class Ceremony:
         self.uuid: Optional[str] = data.get('uuid')
         self._display_name: Optional[str] = data.get('displayName')
         self.asset_path: Optional[str] = data.get('assetPath')
+        self._raw = data
     
     @property
     def display_name(self):
         """The display name of the Ceremony. This value changes depending on the language you have set.
-        You can also get this value by using `str(Ceremony)`"""
+        You can also get this value (if not `None`) by using `str(Ceremony)`"""
         return self._display_name
 
     def __str__(self):

@@ -33,12 +33,13 @@ class ContentTier:
 		self.uuid: Optional[str] = data.get('uuid')
 		self._display_name: Optional[str] = data.get('displayName')
 		self.dev_name: Optional[str] = data.get('devName')
-		self.rank: Optional[int32] = int32(data.get('rank',0)) if data.get('rank') else None
-		self.juice_value: Optional[int32] = data.get('juiceValue')
-		self.juice_cost: Optional[int32] = data.get('juiceCost')
+		self.rank: Optional[int32] = int32(data.get('rank',0)) if data.get('rank',None) is not None else None
+		self.juice_value: Optional[int32] = data.get('juiceValue') if data.get('juiceValue',None) is not None else None
+		self.juice_cost: Optional[int32] = data.get('juiceCost') if data.get('juiceCost',None) is not None else None
 		self.highlight_color: Optional[str] = '0x'+data.get('highlightColor','') if data.get('highlightColor') else None
 		self.display_icon: Optional[str] = data.get('displayIcon')
 		self.asset_path: Optional[str] = data.get('assetPath')
+		self._raw = data
 	
 	def __str__(self):
 		return self._display_name or ''
@@ -46,5 +47,5 @@ class ContentTier:
 	@property
 	def display_name(self):
 		"""The display name of the content tier. This value changes depending on the language you have set.
-		You can also get this value by using `str(ContentTier)`"""
+		You can also get this value (if not `None`) by using `str(ContentTier)`"""
 		return self._display_name

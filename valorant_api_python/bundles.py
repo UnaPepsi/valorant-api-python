@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Any
+from typing import Optional, Dict, Any
 
 class BundleIcon:
     def __init__(self, data: Dict[str,Any]):
@@ -61,6 +61,7 @@ class Bundle:
         self._promo_description: Optional[str] = data.get('promoDescription')
         self.use_additional_context: Optional[bool] = data.get('useAdditionalContext')
         self.icon: Optional[BundleIcon] = BundleIcon(data) if data.get('displayIcon') else None
+        self._raw = data
     
     def __str__(self):
         return self._display_name or self._description or ''
@@ -68,7 +69,7 @@ class Bundle:
     @property
     def display_name(self) -> Optional[str]:
         """The display name of the bundle. This value changes depending on the language you have set.
-        You can also get this value by using `str(Bundle)`"""
+        You can also get this value (if not `None`) by using `str(Bundle)`"""
         return self._display_name
     
     @property

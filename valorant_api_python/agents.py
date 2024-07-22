@@ -12,7 +12,7 @@ class AgentDisplayIcon:
 
 	@property
 	def display_icon(self) -> Optional[str]:
-		"""The URL of the agent's display icon. You can also get this value by using `str(AgentDisplayIcon)`"""
+		"""The URL of the agent's display icon. You can also get this value (if not `None`) by using `str(AgentDisplayIcon)`"""
 		return self._display_icon
 	@property
 	def display_icon_small(self) -> Optional[str]:
@@ -62,7 +62,7 @@ class AgentRole:
 	@property
 	def display_name(self) -> Optional[str]:
 		"""The display name of the role. This value changes depending on the language you have set.
-  		You can also get this value by using `str(BuddyLevel)`"""
+  		You can also get this value (if not `None`) by using `str(BuddyLevel)`"""
 		return self._display_name
 	@property
 	def description(self) -> Optional[str]:
@@ -83,11 +83,11 @@ class AgentRecruitmentData:
 		if data is None: data = {}
 		self.counter_id: Optional[str] = data.get('counterId')
 		self.milestone_id: Optional[str] = data.get('milestoneId')
-		self.milestone_threshold: Optional[int32] = int32(data.get('milestoneThreshold',0)) if data.get('milestoneThreshold') else None
+		self.milestone_threshold: Optional[int32] = int32(data.get('milestoneThreshold',0)) if data.get('milestoneThreshold',None) is not None else None
 		self.use_level_vp_cost_override: Optional[bool] = data.get('useLevelVpCostOverride')
-		self.level_vp_cost_override: Optional[int32] = int32(data.get('levelVpCostOverride',0)) if data.get('levelVpCostOverride') else None
-		self.start_date: Optional[datetime] = datetime.strptime(data.get('startDate'),'%Y-%m-%dT%H:%M:%SZ') if data.get('startDate') else None #type: ignore
-		self.end_date: Optional[datetime] = datetime.strptime(data.get('endDate'),'%Y-%m-%dT%H:%M:%SZ') if data.get('startDate') else None #type: ignore
+		self.level_vp_cost_override: Optional[int32] = int32(data.get('levelVpCostOverride',0)) if data.get('levelVpCostOverride',None) is not None else None
+		self.start_date: Optional[datetime] = datetime.strptime(data.get('startDate',''),'%Y-%m-%dT%H:%M:%SZ') if data.get('startDate') else None
+		self.end_date: Optional[datetime] = datetime.strptime(data.get('endDate',''),'%Y-%m-%dT%H:%M:%SZ') if data.get('startDate') else None
 
 class AgentAbility:
 	def __init__(self, data: Optional[Dict[str,Any]]):
@@ -107,7 +107,7 @@ class AgentAbility:
 	@property
 	def display_name(self) -> Optional[str]:
 		"""The display name of the ability. This value changes depending on the language you have set.
-  		You can also get this value by using `str(AgentAbility)`"""
+  		You can also get this value (if not `None`) by using `str(AgentAbility)`"""
 		return self._display_name
 	@property
 	def description(self) -> Optional[str]:
@@ -122,7 +122,7 @@ class VoiceLineMediaList:
 	# TODO: make properties for this
 	def __init__(self, data: Optional[Dict[str,Any]]):
 		if data is None: data = {}
-		self.id: Optional[int32] = int32(data.get('id',0)) if data.get('id') else None
+		self.id: Optional[int32] = int32(data.get('id',0)) if data.get('id',None) is not None else None
 		self.wwise: Optional[str] = data.get('wwise')
 		self.wave: Optional[str] = data.get('wave')
 
@@ -196,19 +196,20 @@ class Agent:
 		self._display_name: Optional[str] = data.get('displayName')
 		self._description: Optional[str] = data.get('description')
 		self.developer_name: Optional[str] = data.get('developerName')
-		self._character_tags: List[str] = data.get('characterTags',[])
-		self.icon: Optional[AgentDisplayIcon] = AgentDisplayIcon(data.get('displayIcon'),data.get('displayIconSmall')) if data.get('displayIcon') else None
+		self._character_tags: List[str] = data.get('characterTags',[]) if data.get('characterTags') else []
+		self.icon: Optional[AgentDisplayIcon] = AgentDisplayIcon(data.get('displayIcon'),data.get('displayIconSmall')) if data.get('displayIcon') or data.get('displayIconSmall') else None
 		self.bust_portrait: Optional[str] = data.get('bustPortrait')
 		self.portrait: AgentPortrait = AgentPortrait(data.get('fullPortrait'),data.get('fullPortraitV2'),data.get('killFeedPortrait'),data.get('isFullPortraitFacingRight'))
 		self.background: Optional[str] = data.get('background')
-		self.background_gradient_colors: List[str] = data.get('backgroundGradientColors',[])
+		self.background_gradient_colors: List[str] = data.get('backgroundGradientColors',[]) if data.get('backgroundGradientColors') else []
 		self.is_playable_character: Optional[bool] = data.get('isPlayableCharacter')
 		self.is_available_for_test: Optional[bool] = data.get('isAvailableForTest')
 		self.is_base_content: Optional[str] = data.get('isBaseContent')
 		self.role: Optional[AgentRole] = AgentRole(data.get('role')) if data.get('role') else None
 		self.recruitment_data: Optional[AgentRecruitmentData] = AgentRecruitmentData(data.get('recruitmentData')) if data.get('recruitmentData') else None
-		self.abilities: List[AgentAbility] = [AgentAbility(info) for info in data.get('abilities',[])]
+		self.abilities: List[AgentAbility] = [AgentAbility(info) for info in data.get('abilities',[])] if data.get('abilities') else []
 		self.voice_line: Optional[VoiceLine] = VoiceLine(data.get('voiceLine')) if data.get('voiceLine') else None
+		self._raw = data
 
 	def __str__(self):
 		return self._display_name or ''
@@ -216,7 +217,7 @@ class Agent:
 	@property
 	def display_name(self):
 		"""The display name of the Agent. This value changes depending on the language you have set.
-  		You can also get this value by using `str(Agent)`"""
+  		You can also get this value (if not `None`) by using `str(Agent)`"""
 		return self._display_name
 	
 	@property
