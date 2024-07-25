@@ -28,13 +28,13 @@ class ContractChapter:
     def __init__(self, data: Dict[str,Any]):
         self.is_epilogue: Optional[bool] = data.get('isEpilogue')
         self.levels: List[ContractChapterLevel] = [ContractChapterLevel(info) for info in data.get('levels',[])]
-        self.free_rewards: List[ContractFreeReward] = [ContractFreeReward(info) for info in data.get('freeRewards',[])] if data.get('freeRewards') else []
+        self.free_rewards: List[ContractFreeReward] = [ContractFreeReward(info) for info in data.get('freeRewards',[])]
 
 class ContractContent:
     def __init__(self, data: Dict[str,Any]):
         self.relation_type: Optional[str] = data.get('relationType')
         self.relation_uuid: Optional[str] = data.get('relationUuid')
-        self.chapters: List[ContractChapter] = [ContractChapter(info) for info in data.get('chapters',[])] if data.get('chapters') else []
+        self.chapters: List[ContractChapter] = [ContractChapter(info) for info in data.get('chapters',[])]
         self.premium_reward_schedule_uuid: Optional[str] = data.get('premiumRewardScheduleUuid')
         self.premium_vp_cost: Optional[int32] = int32(data.get('premiumVPCost',0)) if data.get('premiumVPCost',None) is not None else None
 

@@ -66,14 +66,13 @@ class Gamemode:
 		self.is_minimap_hidden: Optional[bool] = data.get('isMinimapHidden')
 		self.orb_count: Optional[int32] = int32(data.get('orbCount',0)) if data.get('orbCount',None) is not None else None
 		self.round_per_half: Optional[int32] = int32(data.get('roundPerHalf',0)) if data.get('roundPerHalf',None) is not None else None
-		self.team_roles: List[str] = data.get('teamRoles',[]) if data.get('teamRoles') else []
-		self.game_feature_overrides: List[GameFeatureOverrides] = [GameFeatureOverrides(info.get('featureName'),info.get('state')) for info in data.get('gameFeatureOverrides',[])] \
-		if data.get('gameFeatureOverrides') else []
-		self.game_rule_overrides: List[GameRuleOverrides] = [GameRuleOverrides(info.get('ruleName'),info.get('state')) for info in data.get('gameRuleBoolOverrides',[])] \
-		if data.get('gameRuleBoolOverrides') else []
+		self.team_roles: List[str] = data.get('teamRoles',[])
+		self.game_feature_overrides: List[GameFeatureOverrides] = [GameFeatureOverrides(info.get('featureName'),info.get('state')) for info in data.get('gameFeatureOverrides',[])]
+		self.game_rule_overrides: List[GameRuleOverrides] = [GameRuleOverrides(info.get('ruleName'),info.get('state')) for info in data.get('gameRuleBoolOverrides',[])]
 		self.display_icon: Optional[str] = data.get('displayIcon')
 		self.list_view_icon_tall: Optional[str] = data.get('listViewIconTall')
 		self.asset_path: Optional[str] = data.get('assetPath')
+		self._raw = data
 	
 	def __str__(self):
 		return self._display_name or ''
@@ -155,6 +154,7 @@ class GamemodeEquipable:
 		self.icon: Optional[GamemodeEquipableIcon] = GamemodeEquipableIcon(data.get('displayIcon'),data.get('killStreamIcon')) \
 		if data.get('displayIcon') or data.get('killStreamIcon') else None
 		self.asset_path: Optional[str] = data.get('assetPath')
+		self._raw = data
 	
 	def __str__(self):
 		return self._display_name or ''

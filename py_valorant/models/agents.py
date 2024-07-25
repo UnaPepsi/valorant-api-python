@@ -129,19 +129,19 @@ class VoiceLineMediaList:
 class VoiceLine:
 	def __init__(self, data: Optional[Dict[str,Any]]):
 		if data is None: data = {}
-		self._min_duration_single: Optional[float32] = float32(data.get('minDuration',0.0)) if data.get('minDuration') else None
-		self._max_duration_single: Optional[float32] = float32(data.get('maxDuration',0.0)) if data.get('maxDuration') else None
+		self._min_duration: Optional[float32] = float32(data.get('minDuration',0.0)) if data.get('minDuration') else None
+		self._max_duration: Optional[float32] = float32(data.get('maxDuration',0.0)) if data.get('maxDuration') else None
 		self.media_list: Optional[VoiceLineMediaList] = VoiceLineMediaList(data.get('mediaList')) if data.get('mediaList') else None
 	
 	@property
-	def min_duration_single(self) -> Optional[float32]:
+	def min_duration(self) -> Optional[float32]:
 		"""The minimum duration of the voice line for a single play."""
-		return self._min_duration_single
+		return self._min_duration
 	
 	@property
-	def max_duration_single(self) -> Optional[float32]:
+	def max_duration(self) -> Optional[float32]:
 		"""The maximum duration of the voice line for a single play."""
-		return self._max_duration_single
+		return self._max_duration
 
 class Agent:
 	"""
@@ -196,18 +196,18 @@ class Agent:
 		self._display_name: Optional[str] = data.get('displayName')
 		self._description: Optional[str] = data.get('description')
 		self.developer_name: Optional[str] = data.get('developerName')
-		self._character_tags: List[str] = data.get('characterTags',[]) if data.get('characterTags') else []
+		self._character_tags: List[str] = data.get('characterTags',[])
 		self.icon: Optional[AgentDisplayIcon] = AgentDisplayIcon(data.get('displayIcon'),data.get('displayIconSmall')) if data.get('displayIcon') or data.get('displayIconSmall') else None
 		self.bust_portrait: Optional[str] = data.get('bustPortrait')
 		self.portrait: AgentPortrait = AgentPortrait(data.get('fullPortrait'),data.get('fullPortraitV2'),data.get('killFeedPortrait'),data.get('isFullPortraitFacingRight'))
 		self.background: Optional[str] = data.get('background')
-		self.background_gradient_colors: List[str] = data.get('backgroundGradientColors',[]) if data.get('backgroundGradientColors') else []
+		self.background_gradient_colors: List[str] = data.get('backgroundGradientColors',[])
 		self.is_playable_character: Optional[bool] = data.get('isPlayableCharacter')
 		self.is_available_for_test: Optional[bool] = data.get('isAvailableForTest')
 		self.is_base_content: Optional[str] = data.get('isBaseContent')
 		self.role: Optional[AgentRole] = AgentRole(data.get('role')) if data.get('role') else None
 		self.recruitment_data: Optional[AgentRecruitmentData] = AgentRecruitmentData(data.get('recruitmentData')) if data.get('recruitmentData') else None
-		self.abilities: List[AgentAbility] = [AgentAbility(info) for info in data.get('abilities',[])] if data.get('abilities') else []
+		self.abilities: List[AgentAbility] = [AgentAbility(info) for info in data.get('abilities',[])]
 		self.voice_line: Optional[VoiceLine] = VoiceLine(data.get('voiceLine')) if data.get('voiceLine') else None
 		self._raw = data
 

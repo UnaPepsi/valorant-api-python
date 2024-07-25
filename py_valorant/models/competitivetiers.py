@@ -71,7 +71,7 @@ class CompetitiveTier:
     def __init__(self, data: Dict[str,Any]):
         self.uuid: Optional[str] = data.get('uuid')
         self.asset_object_name: Optional[str] = data.get('assetObjectName') #episodes
-        self.tiers: List[Tier] = [Tier(info) for info in data.get('tiers',[])] if data.get('tiers') else []
+        self.tiers: List[Tier] = [Tier(info) for info in data.get('tiers',[])]
         self.asset_path: Optional[str] = data.get('assetPath')
-        self._filter_unused_tiers: List[Tier] = list(filter(lambda tier: tier.name and 'Unused' not in tier.name, self.tiers)) if self.tiers else []
+        self._filter_unused_tiers: List[Tier] = list(filter(lambda tier: tier.name and 'Unused' not in tier.name, self.tiers))
         self._raw = data

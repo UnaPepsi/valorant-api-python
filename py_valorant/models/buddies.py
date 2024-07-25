@@ -55,7 +55,7 @@ class Buddy:
         self.theme_uuid: Optional[str] = data.get('themeUuid')
         self.display_icon: Optional[str] = data.get('displayIcon')
         self.asset_path: Optional[str] = data.get('assetPath')
-        self.levels: List[BuddyLevel] = data.get('levels',[]) if data.get('levels') else []
+        self.levels: List[BuddyLevel] = data.get('levels',[])
         self._raw = data
     
     def __str__(self):
