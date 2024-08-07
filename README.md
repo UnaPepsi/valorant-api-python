@@ -1,4 +1,4 @@
-# Type-Safe Syncronous and Asyncronous Python wrapper for <a href='https://valorant-api.com/'>Valorant-API.com</a>
+# Type-Safe Synchronous and Asynchronous Python wrapper for <a href='https://valorant-api.com/'>Valorant-API.com</a>
 
 This library supports both **sync**, and **async** for its endpoints, is **type-checked** and supports **caching**
 
