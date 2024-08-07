@@ -70,7 +70,7 @@ class Map:
 	Operations
 	----------
 		**str(Map)**
-		Returns the display name of the Map. If None, returns an empty string<br>
+		Returns the display name of the Map. If None, returns an empty string<br class='lmfao'>
 		**Map == Map**
 		Returns True if both Maps are equal
 	"""

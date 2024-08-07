@@ -199,13 +199,14 @@ class Agent:
 		self._character_tags: List[str] = data.get('characterTags',[])
 		self.icon: Optional[AgentDisplayIcon] = AgentDisplayIcon(data.get('displayIcon'),data.get('displayIconSmall')) if data.get('displayIcon') or data.get('displayIconSmall') else None
 		self.bust_portrait: Optional[str] = data.get('bustPortrait')
-		self.portrait: AgentPortrait = AgentPortrait(data.get('fullPortrait'),data.get('fullPortraitV2'),data.get('killFeedPortrait'),data.get('isFullPortraitFacingRight'))
+		self.portrait: Optional[AgentPortrait] = AgentPortrait(data.get('fullPortrait'),data.get('fullPortraitV2'),data.get('killfeedPortrait'),data.get('isFullPortraitRightFacing')) \
+		if data.get('fullPortrait') or data.get('fullPortraitV2') or data.get('killfeedPortrait') or data.get('isFullPortraitRightFacing') else None
 		self.background: Optional[str] = data.get('background')
 		self.background_gradient_colors: List[str] = data.get('backgroundGradientColors',[])
 		self.is_playable_character: Optional[bool] = data.get('isPlayableCharacter')
 		self.is_available_for_test: Optional[bool] = data.get('isAvailableForTest')
 		self.is_base_content: Optional[str] = data.get('isBaseContent')
-		self.role: Optional[AgentRole] = AgentRole(data.get('role')) if data.get('role') else None
+		self.role: Optional[AgentRole] = AgentRole(data.get('role',{})) if data.get('role') else None
 		self.recruitment_data: Optional[AgentRecruitmentData] = AgentRecruitmentData(data.get('recruitmentData')) if data.get('recruitmentData') else None
 		self.abilities: List[AgentAbility] = [AgentAbility(info) for info in data.get('abilities',[])]
 		self.voice_line: Optional[VoiceLine] = VoiceLine(data.get('voiceLine')) if data.get('voiceLine') else None

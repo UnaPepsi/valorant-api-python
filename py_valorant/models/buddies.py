@@ -8,7 +8,7 @@ class BuddyLevel:
         self.hide_if_not_found: Optional[bool] = data.get('hideIfNotFound')
         self._display_name: Optional[str] = data.get('displayName')
         self.display_icon: Optional[str] = data.get('displayIcon')
-        self.asset_path: Optional[str] = data.get('asset_path')
+        self.asset_path: Optional[str] = data.get('assetPath')
     
     def __str__(self):
         return self._display_name or ''
@@ -51,11 +51,11 @@ class Buddy:
     def __init__(self, data: Dict[str,Any]):
         self.uuid: Optional[str] = data.get('uuid')
         self._display_name: Optional[str] = data.get('displayName')
-        self.is_hidden_if__not_owner: Optional[bool] = data.get('isHiddenIfNotOwner')
+        self.is_hidden_if__not_owner: Optional[bool] = data.get('isHiddenIfNotOwned')
         self.theme_uuid: Optional[str] = data.get('themeUuid')
         self.display_icon: Optional[str] = data.get('displayIcon')
         self.asset_path: Optional[str] = data.get('assetPath')
-        self.levels: List[BuddyLevel] = data.get('levels',[])
+        self.levels: List[BuddyLevel] = [BuddyLevel(info) for info in data.get('levels',[])] if data.get('levels') else []
         self._raw = data
     
     def __str__(self):

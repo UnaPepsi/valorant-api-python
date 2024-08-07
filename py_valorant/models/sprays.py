@@ -13,7 +13,7 @@ class SprayMedia:
 class SprayLevel:
 	def __init__(self, data: Dict[str,Any]):
 		self.uuid: Optional[str] = data.get('uuid')
-		self.spray_level: Optional[int32] = data.get('sprayLevel')
+		self.spray_level: Optional[int32] = int32(data.get('sprayLevel',0)) if data.get('sprayLevel') is not None else None
 		self._display_name: Optional[str] = data.get('displayName')
 		self.display_icon: Optional[str] = data.get('displayIcon')
 		self.asset_path: Optional[str] = data.get('assetPath')

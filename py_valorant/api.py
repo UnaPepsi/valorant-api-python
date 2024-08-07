@@ -2,22 +2,7 @@ import aiohttp
 import requests
 from .errors import *
 from typing import Literal, List, Dict, Any, Union, get_args, Optional
-from .models.agents import Agent
-from .models.buddies import Buddy, BuddyLevel
-from .models.bundles import Bundle
-from .models.ceremonies import Ceremony
-from .models.competitivetiers import CompetitiveTier
-from .models.contenttiers import ContentTier
-from .models.contracts import Contract
-from .models.currencies import Currency
-from .models.events import Event
-from .models.gamemodes import Gamemode, GamemodeEquipable
-from .models.gears import Gear
-from .models.levelborders import LevelBorder
-from .models.maps import Map
-from .models.playercards import PlayerCard
-from .models.playertitles import PlayerTitle
-from .models.sprays import Spray, SprayLevel
+from .models import *
 from .cache import *
 
 BASE = "https://valorant-api.com/v1"
@@ -45,6 +30,8 @@ class ValorantAPI:
 		self.player_card = SyncPlayerCardEndpoint(self)
 		self.player_title = SyncPlayerTitleEndpoint(self)
 		self.spray = SyncSprayEndpoint(self)
+		self.theme = SyncThemeEndpoint(self)
+		self.weapon = SyncWeaponEndpoint(self)
 
 	@property
 	def language(self):
@@ -74,6 +61,8 @@ class ValorantAPIAsync(ValorantAPI): #This is probably just repeating but if I d
 		self.player_card = AsyncPlayerCardEndpoint(self)
 		self.player_title = AsyncPlayerTitleEndpoint(self)
 		self.spray = AsyncSprayEndpoint(self)
+		self.theme = AsyncThemeEndpoint(self)
+		self.weapon = AsyncWeaponEndpoint(self)
 		
 class SyncClient:
 	def get(self, endpoint: str, **params) -> Dict[str,Any]:
@@ -82,10 +71,10 @@ class SyncClient:
 		if resp.status_code == 200:
 			return data
 		if resp.status_code == 400:
-			raise InvalidOrMissingParameters(data['status'],'Invalid or missing parameters')
+			raise InvalidOrMissingParameters(data['status'],'Invalid or missing parameters',data)
 		elif resp.status_code == 404:
-			raise UUIDNotFound(data['status'],'UUID not valid')
-		raise BaseException(data['status'],data['error'])
+			raise NotFound(data['status'],'UUID not valid',data)
+		raise BaseException(data['status'],data['error'],data)
 	
 class AsyncClient:
 	async def get(self, endpoint: str, **params) -> Dict[str,Any]:
@@ -100,10 +89,10 @@ class AsyncClient:
 				if resp.status == 200:
 					return data
 				if resp.status == 400:
-					raise InvalidOrMissingParameters(data['status'],'Invalid or missing parameters')
+					raise InvalidOrMissingParameters(data['status'],'Invalid or missing parameters',data)
 				elif resp.status == 404:
-					raise UUIDNotFound(data['status'],'UUID not valid')
-				raise BaseException(data['status'],data['error'])
+					raise NotFound(data['status'],'UUID not valid',data)
+				raise BaseException(data['status'],data['error'],data)
 
 #Endpoints
 class BaseEndpoint:
@@ -1422,3 +1411,337 @@ class AsyncSprayEndpoint(BaseEndpoint):
 			raise ValueError('Invalid session type')
 		data = await self._client._session.get('/sprays/levels/%s'%uuid,language=self.client._language)
 		return SprayLevel(data.get('data',{}))
+
+class SyncThemeEndpoint(BaseEndpoint):
+	@sync_caching
+	def fetch_all(self, *, cache: Optional[bool] = False) -> List[Theme]:
+		"""Fetches all themes' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/themes',language=self._client._language)
+		return [Theme(info) for info in data.get('data',[])]
+	
+	@sync_caching
+	def fetch_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> Theme:
+		"""
+		Fetches a theme's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Theme
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/themes/%s'%uuid,language=self.client._language)
+		return Theme(data.get('data',{}))
+
+class AsyncThemeEndpoint(BaseEndpoint):
+	@async_caching
+	async def fetch_all(self, *, cache: Optional[bool] = False) -> List[Theme]:
+		"""Fetches all themes' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/themes',language=self._client._language)
+		return [Theme(info) for info in data.get('data',[])]
+	
+	@async_caching
+	async def fetch_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> Theme:
+		"""
+		Fetches a theme's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Theme
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/themes/%s'%uuid,language=self._client._language)
+		return Theme(data.get('data',{}))
+	
+class SyncWeaponEndpoint(BaseEndpoint):
+	@sync_caching
+	def fetch_all(self, *, cache: Optional[bool] = False) -> List[Weapon]:
+		"""Fetches all weapons' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/weapons',language=self._client._language)
+		return [Weapon(info) for info in data.get('data',[])]
+	
+	@sync_caching
+	def fetch_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> Weapon:
+		"""
+		Fetches a weapon's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Weapon
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/weapons/%s'%uuid,language=self.client._language)
+		return Weapon(data.get('data',{}))
+
+	@sync_caching
+	def fetch_all_skins(self, *, cache: Optional[bool] = False) -> List[WeaponSkin]:
+		"""Fetches all weapon skins' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/weapons/skins',language=self._client._language)
+		return [WeaponSkin(info) for info in data.get('data',[])]
+
+	@sync_caching
+	def fetch_skin_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> WeaponSkin:
+		"""
+		Fetches a weapon skin's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Weapon Skin
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/weapons/skins/%s'%uuid,language=self.client._language)
+		return WeaponSkin(data.get('data',{}))
+	
+	@sync_caching
+	def fetch_all_skin_chromas(self, *, cache: Optional[bool] = False) -> List[WeaponSkinChroma]:
+		"""Fetches all weapon skin chromas' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/weapons/skinchromas',language=self._client._language)
+		return [WeaponSkinChroma(info) for info in data.get('data',[])]
+
+	@sync_caching
+	def fetch_skin_chroma_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> WeaponSkinChroma:
+		"""
+		Fetches a weapon skin chroma's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Weapon Skin Chroma
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/weapons/skinchromas/%s'%uuid,language=self.client._language)
+		return WeaponSkinChroma(data.get('data',{}))
+	
+	@sync_caching
+	def fetch_all_skin_levels(self, *, cache: Optional[bool] = False) -> List[WeaponSkinLevel]:
+		"""Fetches all weapon skin levels' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/weapons/skinlevels',language=self._client._language)
+		return [WeaponSkinLevel(info) for info in data.get('data',[])]
+	
+	@sync_caching
+	def fetch_skin_level_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> WeaponSkinLevel:
+		"""
+		Fetches a weapon skin level's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Weapon Skin Level
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,AsyncClient):
+			raise ValueError('Invalid session type')
+		data = self._client._session.get('/weapons/skinlevels/%s'%uuid,language=self.client._language)
+		return WeaponSkinLevel(data.get('data',{}))
+
+class AsyncWeaponEndpoint(BaseEndpoint):
+	@async_caching
+	async def fetch_all(self, *, cache: Optional[bool] = False) -> List[Weapon]:
+		"""Fetches all weapons' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/weapons',language=self._client._language)
+		return [Weapon(info) for info in data.get('data',[])]
+	
+	@async_caching
+	async def fetch_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> Weapon:
+		"""
+		Fetches a weapon's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Weapon
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/weapons/%s'%uuid,language=self.client._language)
+		return Weapon(data.get('data',{}))
+
+	@async_caching
+	async def fetch_all_skins(self, *, cache: Optional[bool] = False) -> List[WeaponSkin]:
+		"""Fetches all weapon skins' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/weapons/skins',language=self._client._language)
+		return [WeaponSkin(info) for info in data.get('data',[])]
+
+	@async_caching
+	async def fetch_skin_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> WeaponSkin:
+		"""
+		Fetches a weapon skin's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Weapon Skin
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/weapons/skins/%s'%uuid,language=self.client._language)
+		return WeaponSkin(data.get('data',{}))
+	
+	@async_caching
+	async def fetch_all_skin_chromas(self, *, cache: Optional[bool] = False) -> List[WeaponSkinChroma]:
+		"""Fetches all weapon skin chromas' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/weapons/skinchromas',language=self._client._language)
+		return [WeaponSkinChroma(info) for info in data.get('data',[])]
+
+	@async_caching
+	async def fetch_skin_chroma_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> WeaponSkinChroma:
+		"""
+		Fetches a weapon skin chroma's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Weapon Skin Chroma
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/weapons/skinchromas/%s'%uuid,language=self.client._language)
+		return WeaponSkinChroma(data.get('data',{}))
+	
+	@async_caching
+	async def fetch_all_skin_levels(self, *, cache: Optional[bool] = False) -> List[WeaponSkinLevel]:
+		"""Fetches all weapon skin levels' data
+		
+		Parameters
+		----------
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/weapons/skinlevels',language=self._client._language)
+		return [WeaponSkinLevel(info) for info in data.get('data',[])]
+	
+	@async_caching
+	async def fetch_skin_level_from_uuid(self, uuid: str, *, cache: Optional[bool] = False) -> WeaponSkinLevel:
+		"""
+		Fetches a weapon skin level's data
+		
+		Parameters
+		----------
+		uuid : `str`
+			The UUID of the Weapon Skin Level
+		cache : `Optional[bool]`
+			If `True` returns values saved in cache and if not found it fetches normally and saves to cache.
+			If `False` removes the values previously cached by this method and its used parameters and fetches normally without caching
+		"""
+		if isinstance(self._client._session,SyncClient):
+			raise ValueError('Invalid session type')
+		data = await self._client._session.get('/weapons/skinlevels/%s'%uuid,language=self.client._language)
+		return WeaponSkinLevel(data.get('data',{}))
